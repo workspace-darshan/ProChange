@@ -1,4 +1,10 @@
-import DevDock from "@/components/devdock";
+import AppShell from "@/components/layout/AppShell";
+import DashboardTool from "@/components/tools/DashboardTool";
+
 export default function Home() {
-  return <DevDock />;
+  return (
+    <AppShell activeTool="home">
+      <DashboardTool />
+    </AppShell>
+  );
 }
