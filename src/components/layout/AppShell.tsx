@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -30,6 +30,9 @@ const categoryIcons: Record<string, typeof Braces> = {
   "Testers & Text": Code2,
 };
 
+// Module-level cache so client navigation preserves it across page transitions instantly
+let cachedSidebarScroll = 0;
+
 interface AppShellProps {
   activeTool: string;
   children: React.ReactNode;
@@ -40,8 +43,61 @@ export default function AppShell({ activeTool, children }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const sidebarScrollRef = useRef<HTMLDivElement>(null);
 
   const currentTool = tools.find((t) => t.id === activeTool) || null;
+
+  // Restore sidebar scroll position and ensure active tool is in view
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const listEl = sidebarScrollRef.current;
+    if (!listEl) return;
+
+    // 1. Immediate scroll restoration
+    const savedScroll =
+      cachedSidebarScroll ||
+      Number(
+        (typeof window !== "undefined" &&
+          sessionStorage.getItem("prochange_sidebar_scroll")) ||
+          0
+      );
+
+    if (savedScroll > 0) {
+      listEl.scrollTop = savedScroll;
+    }
+
+    // 2. Ensure active tool is visible inside sidebar viewport
+    if (activeTool && activeTool !== "home") {
+      const timer = setTimeout(() => {
+        if (!listEl) return;
+        const activeEl = listEl.querySelector(
+          ".tool-nav.selected"
+        ) as HTMLElement | null;
+        if (activeEl) {
+          activeEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [sidebarOpen, activeTool]);
+
+  const handleSidebarScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const top = e.currentTarget.scrollTop;
+    cachedSidebarScroll = top;
+    try {
+      sessionStorage.setItem("prochange_sidebar_scroll", top.toString());
+    } catch {}
+  };
+
+  const recordCurrentScroll = () => {
+    if (sidebarScrollRef.current) {
+      const top = sidebarScrollRef.current.scrollTop;
+      cachedSidebarScroll = top;
+      try {
+        sessionStorage.setItem("prochange_sidebar_scroll", top.toString());
+      } catch {}
+    }
+  };
 
   // Keyboard shortcut Ctrl+K / Cmd+K
   useEffect(() => {
@@ -70,8 +126,18 @@ export default function AppShell({ activeTool, children }: AppShellProps) {
       <header className="topbar">
         <Link
           href="/"
+          scroll={false}
           className="brand"
           title="Return to proChange Dashboard"
+          onClick={() => {
+            cachedSidebarScroll = 0;
+            try {
+              sessionStorage.setItem("prochange_sidebar_scroll", "0");
+            } catch {}
+            if (sidebarScrollRef.current) {
+              sidebarScrollRef.current.scrollTop = 0;
+            }
+          }}
         >
           <div className="brand-mark">
             <img
@@ -88,7 +154,7 @@ export default function AppShell({ activeTool, children }: AppShellProps) {
         <div className="topbar-center">
           <button className="global-search" onClick={() => setSearchOpen(true)}>
             <Search size={15} />
-            <span>Search 26 tools, shortcuts, mock data, salary...</span>
+            <span>Search {tools.length} tools, shortcuts, mock data, salary...</span>
             <kbd>
               <Command size={11} /> K
             </kbd>
@@ -136,9 +202,19 @@ export default function AppShell({ activeTool, children }: AppShellProps) {
 
             <Link
               href="/"
+              scroll={false}
               className={
                 "nav-overview " + (activeTool === "home" ? "active-home" : "")
               }
+              onClick={() => {
+                cachedSidebarScroll = 0;
+                try {
+                  sessionStorage.setItem("prochange_sidebar_scroll", "0");
+                } catch {}
+                if (sidebarScrollRef.current) {
+                  sidebarScrollRef.current.scrollTop = 0;
+                }
+              }}
             >
               <div className="nav-mini-icon">
                 <Zap size={16} />
@@ -150,11 +226,13 @@ export default function AppShell({ activeTool, children }: AppShellProps) {
             {/* Featured Whiteboard & Architecture Canvas */}
             <Link
               href="/canvas-board"
+              scroll={false}
               className={
                 "nav-overview " + (activeTool === "canvas-board" ? "active-home" : "")
               }
               style={{ marginTop: "-6px", marginBottom: "14px" }}
               title="Eraser.io & Notion-style Whiteboard & Architecture Canvas"
+              onClick={recordCurrentScroll}
             >
               <div className="nav-mini-icon" style={{ background: "rgba(124, 92, 252, 0.16)", color: "#9d85fc" }}>
                 <Paintbrush size={15} />
@@ -179,7 +257,11 @@ export default function AppShell({ activeTool, children }: AppShellProps) {
 
             <div className="side-label">ALL {tools.length} UTILITIES</div>
 
-            <div className="sidebar-scroll-list">
+            <div
+              className="sidebar-scroll-list"
+              ref={sidebarScrollRef}
+              onScroll={handleSidebarScroll}
+            >
               {Object.entries(
                 tools.reduce(
                   (groups, t) => ({
@@ -200,6 +282,8 @@ export default function AppShell({ activeTool, children }: AppShellProps) {
                       <Link
                         key={tool.id}
                         href={`/${tool.id}`}
+                        scroll={false}
+                        onClick={recordCurrentScroll}
                         className={
                           "tool-nav " + (activeTool === tool.id ? "selected" : "")
                         }
@@ -238,7 +322,7 @@ export default function AppShell({ activeTool, children }: AppShellProps) {
                 <PanelLeftClose size={15} />
               )}
             </button>
-            <Link href="/" className="crumb-link-btn">
+            <Link href="/" scroll={false} className="crumb-link-btn">
               proChange
             </Link>
             <span className="crumb-slash">/</span>
@@ -282,13 +366,14 @@ export default function AppShell({ activeTool, children }: AppShellProps) {
             </div>
             <div className="search-results">
               <div className="results-label">
-                {searchQuery ? "SEARCH RESULTS" : "ALL 26 UTILITIES"}
+                {searchQuery ? "SEARCH RESULTS" : `ALL ${tools.length} UTILITIES`}
               </div>
               {searchFiltered.length ? (
                 searchFiltered.map((t) => (
                   <Link
                     key={t.id}
                     href={`/${t.id}`}
+                    scroll={false}
                     className="search-result"
                     onClick={() => setSearchOpen(false)}
                   >

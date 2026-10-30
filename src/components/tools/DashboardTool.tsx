@@ -84,13 +84,38 @@ export default function DashboardTool() {
                 />
                 <div className="hero-badge" style={{ margin: 0 }}>
                   <Sparkles size={13} />
-                  <span>PROCHANGE SUITE · 26 POWER TOOLS</span>
+                  <span>PROCHANGE SUITE · 38 POWER UTILITIES</span>
                 </div>
               </div>
-              <h1 className="hero-title">proChange Developer & Utility Powerhouse</h1>
+              <h1 className="hero-title">proChange Developer & Daily Powerhouse</h1>
               <p className="hero-subtitle">
-                Fast, local-first converters, mock data generation (up to 1,000+ items), salary in-hand calculations, currency & crypto trends, disposable temp mail, and daily text templates.
+                Fast, local-first converters, salary in-hand calculations, 250 countries explorer, live world clock, and daily live morning dashboard.
               </p>
+
+              {/* Aaj Ka Dashboard CTA */}
+              <div style={{ marginTop: "14px", marginBottom: "16px" }}>
+                <Link
+                  href="/aaj-ka-dashboard"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "10px 18px",
+                    borderRadius: "14px",
+                    background: "linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(234, 88, 12, 0.2))",
+                    border: "1px solid rgba(245, 158, 11, 0.5)",
+                    color: "#fef3c7",
+                    fontSize: "13px",
+                    fontWeight: "700",
+                    textDecoration: "none",
+                    boxShadow: "0 4px 14px rgba(245, 158, 11, 0.15)",
+                  }}
+                >
+                  <span style={{ fontSize: "16px" }}>🌅</span>
+                  <span>Aaj Ka Dashboard — Gold, Mausam, Mandi Bhav, USD & WhatsApp Rate Card</span>
+                  <span style={{ color: "#fbbf24" }}>→</span>
+                </Link>
+              </div>
             </div>
 
             {/* Home Search Box */}

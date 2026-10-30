@@ -252,6 +252,15 @@ export const tools: ToolDefinition[] = [
 
   // 5. Daily & Finance Utilities
   {
+    id: "aaj-ka-dashboard",
+    name: "Aaj Ka Dashboard",
+    description: "Daily morning hub: Gold & Silver rates, Mausam+AQI, USD-INR, Mandi Bhav, Mutual Fund NAV, Daily streak & WhatsApp share card.",
+    category: "Daily & Finance",
+    icon: "🌅",
+    keywords: ["aaj ka dashboard", "gold", "silver", "mandi bhav", "weather", "aqi", "usd inr", "mutual fund", "whatsapp card", "daily", "streak", "quiz"],
+    badge: "Daily Hub",
+  },
+  {
     id: "salary-calculator",
     name: "Salary & LPA In-Hand",
     description: "Calculate take-home monthly salary from LPA / CTC with taxes, PF & deduction breakdown.",
@@ -296,6 +305,33 @@ export const tools: ToolDefinition[] = [
     keywords: ["movies", "cinema", "films", "tv", "ratings", "entertainment", "trending"],
     badge: "Trending",
   },
+  {
+    id: "world-explorer",
+    name: "World Country Explorer",
+    description: "Explore 250 sovereign countries, key statistics, borders, largest cities, and demographics live from countries.dev API.",
+    category: "Daily & Finance",
+    icon: "🌐",
+    keywords: ["world", "country", "countries.dev", "explore", "demographics", "population", "capital", "cities", "borders", "india", "japan"],
+    badge: "countries.dev",
+  },
+  {
+    id: "world-clock",
+    name: "World Clock & Timezones",
+    description: "Accurate live international clocks, UTC offsets, day/night cycles, and interactive meeting scrubber powered by countries.dev API.",
+    category: "Daily & Finance",
+    icon: "🕒",
+    keywords: ["world clock", "clock", "timezone", "time", "utc", "meeting planner", "analog", "digital", "hours"],
+    badge: "Accurate Live",
+  },
+  {
+    id: "weather",
+    name: "Live Weather Forecast",
+    description: "Real-time atmospheric conditions, 24-hour hourly temperatures, and 7-day outlook for any world location via Open-Meteo API.",
+    category: "Daily & Finance",
+    icon: "⛅",
+    keywords: ["weather", "forecast", "temperature", "climate", "open-meteo", "rain", "humidity", "wind", "7-day"],
+    badge: "Open-Meteo",
+  },
 
   // 6. Testers & Text
   {
@@ -333,5 +369,14 @@ export const tools: ToolDefinition[] = [
     icon: "⇄",
     keywords: ["json", "compare", "diff", "delta", "changes"],
     badge: "Swap A ⇄ B",
+  },
+  {
+    id: "typing-test",
+    name: "Typing Speed Test",
+    description: "Fast, distraction-free typing speed test with live WPM, accuracy, English, Hindi & Gujarati scripts, live charts, and daily challenge.",
+    category: "Testers & Text",
+    icon: "⌨",
+    keywords: ["typing", "wpm", "speed", "keyboard", "test", "practice", "hindi typing", "gujarati typing"],
+    badge: "Offline",
   },
 ];

@@ -34,6 +34,11 @@ import JsonDiffTool from "@/components/tools/JsonDiffTool";
 import WhiteboardCanvasTool from "@/components/tools/WhiteboardCanvasTool";
 import ImageEditorTool from "@/components/tools/ImageEditorTool";
 import SvgEditorTool from "@/components/tools/SvgEditorTool";
+import WorldClockTool from "@/components/tools/WorldClockTool";
+import WorldExplorerTool from "@/components/tools/WorldExplorerTool";
+import WeatherTool from "@/components/tools/WeatherTool";
+import AajKaDashboardTool from "@/components/tools/AajKaDashboardTool";
+import TypingTestTool from "@/components/tools/TypingTestTool";
 
 interface ToolRouterProps {
   toolId: string;
@@ -43,6 +48,19 @@ export default function ToolRouter({ toolId }: ToolRouterProps) {
   switch (toolId) {
     case "home":
       return <DashboardTool />;
+    case "typing-test":
+    case "typing-speed-test":
+      return <TypingTestTool />;
+    case "aaj-ka-dashboard":
+    case "daily-dashboard":
+      return <AajKaDashboardTool />;
+    case "world-explorer":
+      return <WorldExplorerTool />;
+    case "world-clock":
+      return <WorldClockTool />;
+    case "weather":
+    case "live-weather":
+      return <WeatherTool />;
     case "canvas-board":
       return <WhiteboardCanvasTool />;
     case "image-editor":
