@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
-:root {
+:root,
+html.dark,
+body.dark,
+.app.dark {
   color-scheme: dark;
   --bg: #0f1013;
   --surface: #15161b;
@@ -95,6 +98,9 @@ a {
   color: var(--text);
 }
 
+:root.light,
+html.light,
+body.light,
 .app.light {
   color-scheme: light;
   --bg: #f8f9fa;

@@ -32,6 +32,30 @@ const categoryIcons: Record<string, typeof Braces> = {
 
 // Module-level cache so client navigation preserves it across page transitions instantly
 let cachedSidebarScroll = 0;
+let cachedDark: boolean | null = null;
+
+const getInitialTheme = (): boolean => {
+  if (cachedDark !== null) return cachedDark;
+  if (typeof window !== "undefined") {
+    try {
+      const saved = localStorage.getItem("prochange_theme");
+      if (saved === "light") {
+        cachedDark = false;
+        return false;
+      }
+      if (saved === "dark") {
+        cachedDark = true;
+        return true;
+      }
+      if (document.documentElement.classList.contains("light")) {
+        cachedDark = false;
+        return false;
+      }
+    } catch {}
+  }
+  cachedDark = true;
+  return true;
+};
 
 interface AppShellProps {
   activeTool: string;
@@ -39,13 +63,72 @@ interface AppShellProps {
 }
 
 export default function AppShell({ activeTool, children }: AppShellProps) {
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState<boolean>(getInitialTheme);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const sidebarScrollRef = useRef<HTMLDivElement>(null);
 
   const currentTool = tools.find((t) => t.id === activeTool) || null;
+
+  // Keep DOM and cross-tab/cross-page events synchronized with current theme
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.classList.toggle("dark", dark);
+      document.documentElement.classList.toggle("light", !dark);
+      document.documentElement.style.colorScheme = dark ? "dark" : "light";
+    }
+
+    const handleCustomTheme = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      const isDark = customEvent.detail === "dark";
+      cachedDark = isDark;
+      setDark(isDark);
+    };
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "prochange_theme") {
+        const isDark = e.newValue !== "light";
+        cachedDark = isDark;
+        setDark(isDark);
+        if (typeof document !== "undefined") {
+          document.documentElement.classList.toggle("dark", isDark);
+          document.documentElement.classList.toggle("light", !isDark);
+          document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+        }
+      }
+    };
+
+    window.addEventListener("prochange-theme-change", handleCustomTheme);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener("prochange-theme-change", handleCustomTheme);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, [dark]);
+
+  const toggleTheme = () => {
+    setDark((prev) => {
+      const next = !prev;
+      cachedDark = next;
+      try {
+        localStorage.setItem("prochange_theme", next ? "dark" : "light");
+      } catch {}
+      if (typeof document !== "undefined") {
+        document.documentElement.classList.toggle("dark", next);
+        document.documentElement.classList.toggle("light", !next);
+        document.documentElement.style.colorScheme = next ? "dark" : "light";
+      }
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("prochange-theme-change", {
+            detail: next ? "dark" : "light",
+          })
+        );
+      }
+      return next;
+    });
+  };
 
   // Restore sidebar scroll position and ensure active tool is in view
   useEffect(() => {
@@ -165,7 +248,7 @@ export default function AppShell({ activeTool, children }: AppShellProps) {
           <button
             className="icon-button"
             aria-label="Toggle theme"
-            onClick={() => setDark((v) => !v)}
+            onClick={toggleTheme}
             title={dark ? "Switch to light mode" : "Switch to dark mode"}
           >
             {dark ? <Sun size={16} /> : <Moon size={16} />}
